@@ -3,7 +3,7 @@ glslprep.js
 
 This repository provides a simple GLSL minifier and syntax checker based on [glsl-unit](https://code.google.com/p/glsl-unit/). Minification is conservative, and does not change the meaning of the processed code. 
 
-Other than glsl-unit as a whole, this library does not depend on [mustache.js](https://github.com/janl/mustache.js) or [Node.js](https://nodejs.org) and can easily be used within browser-based development tools. Try the [demo](http://tschw.github.io/glslprep/smoke_test.html)!
+Other than glsl-unit as a whole, this library does not depend on [mustache.js](https://github.com/janl/mustache.js) or [Node.js](https://nodejs.org) and can easily be used within browser-based development tools. Try the [demo](http://tschw.github.io/glslprep.js/smoke_test.html)!
 
 The library file is built using [Google's Closure Compiler](https://developers.google.com/closure/compiler/) in ADVANCED mode resulting in a source code size of less than a hundred kilobytes.
 
