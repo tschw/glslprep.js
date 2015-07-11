@@ -1,0 +1,71 @@
+<project name="glslprep" basedir="." default="build">
+
+	<property name="entry" value="glslprep" />
+	<property name="prjname" value="${ant.project.name}" />
+	<property name="outfile" value="${basedir}/${prjname}.min.js" />
+
+	<property name="srcdir" value="${basedir}/src" />
+	<property name="prefixfile" value="${srcdir}/prefix.js" />
+
+	<target name="clean" description="delete build output">
+
+		<delete file="${outfile}"/>
+
+	</target>
+
+
+	<target name="build">
+
+		<tempfile property="temp.file" />
+
+		<java jar="${basedir}/tools/closure-compiler.jar" failonerror="true" fork="true">
+
+			<arg line="--js_output_file ${temp.file}" />
+			<arg line="--closure_entry_point ${entry}" />
+			<arg value="--js"/><arg file="${srcdir}/**.js"/>
+
+
+			<arg line="--compilation_level ADVANCED_OPTIMIZATIONS" />
+
+			<arg value="--generate_exports" />
+			<arg value="--only_closure_dependencies" />
+			<arg value="--use_types_for_optimization" />
+
+
+			<arg line="--warning_level VERBOSE --summary_detail_level 3" />
+
+			<arg prefix="--jscomp_error=" 
+					line="accessControls checkTypes" />
+
+			<arg prefix="--jscomp_warning="
+					line="inferredConstCheck missingProperties typeInvalidation undefinedNames" />
+
+
+			<jvmarg line="-server -XX:+TieredCompilation" />
+
+		</java>
+
+		<concat destfile="${outfile}" eol="lf">
+			<fileset file="${prefixfile}" />
+			<fileset file="${temp.file}" />
+		</concat>
+
+		<delete file="${temp.file}" />
+
+	</target>
+
+
+	<target name="debug-deps">
+
+		<exec executable="python" output="${srcdir}/goog/deps.js">
+			<arg file="${basedir}/tools/calcdeps.py" />
+
+			<arg value="-i"/><arg file="${srcdir}" />
+			<arg value="-p"/><arg file="${srcdir}" />
+			<arg line="-o deps" />
+		</exec>
+
+	</target>
+
+
+</project>

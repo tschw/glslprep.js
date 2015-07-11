@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+	<head>
+		<title>glslprep demo / smoke test</title>
+		<meta charset="utf-8"></meta>
+		<style>
+			body { text-align: center; }
+			fieldset { display: inline-block; }
+			.io { display: block; float: left; min-width: 380px; margin-left: 4px; }
+
+			label {display: block; }
+			textarea { display: inline-block; min-width: 370px; height: 350px; }
+			button { margin: 15px; }
+
+		</style>
+
+<!--
+		<script src="src/goog/base.js"></script>
+		<script src="src/goog/deps.js"></script>
+		<script>
+			goog.ENABLE_DEBUG_LOADER = true;
+			goog.require('glslprep');
+		</script>
+-->
+<!-- -->
+		<script src="glslprep.min.js"></script>
+<!-- -->
+	</head>
+	<body>
+		<form name="input">
+			<fieldset>
+				<legend>Input</legend>
+
+
+				<div class="io">
+					<label for="vertexShader">Vertex Shader:</label>
+					<textarea name="vertexShader">void main(void) {
+	gl_Position = vec4(0.0);
+}</textarea>
+				</div>
+				<div class="io">
+					<label for="fragmentShader">Fragment Shader:</label>
+					<textarea name="fragmentShader">void main(void) {
+	gl_FragColor = vec4(0.0);
+}</textarea>
+				</div>
+			</fieldset>
+		</form>
+
+		<button>Minify</button>
+
+		<form name="output">
+			<fieldset>
+				<legend>Output</legend>
+
+				<div class="io">
+					<label for="vertexShaderOut">Vertex Shader (output):</label>
+					<textarea name="vertexShaderOut" readonly="readonly"></textarea>
+				</div>
+				<div class="io">
+					<label for="fragmentShaderOut">Fragment Shader (output):</label>
+					<textarea name="fragmentShaderOut" readonly="readonly"></textarea>
+				</div>
+			</fieldset>
+		</form>
+
+		<script>
+
+			function run() {
+
+				var shader = [
+					document.getElementsByName('vertexShader')[0].value,
+					document.getElementsByName('fragmentShader')[0].value
+				];
+
+				var defines = { ANSWER: 42 };
+
+				try {
+
+					glslprep.minifyGlsl(shader, defines);
+
+				} catch (e) {
+
+					if (e instanceof glslprep.SyntaxError)
+						window.alert(e.line + ":" + e.column + ": " + e.message);
+					else {
+						console.error(e.stack || e);
+						window.alert("Unexpected error (see console for details).");
+					}
+				}
+
+				document.getElementsByName('vertexShaderOut')[0].value = shader[0];
+				document.getElementsByName('fragmentShaderOut')[0].value = shader[1];
+			}
+
+			run();
+
+			document.getElementsByTagName('button')[0].addEventListener('click', run);
+
+		</script>
+
+
+	</body>
+</html>
