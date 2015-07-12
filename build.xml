@@ -27,7 +27,10 @@
 
 			<arg line="--compilation_level ADVANCED_OPTIMIZATIONS" />
 
-			<arg value="--generate_exports" />
+			<arg line="--define glslprep.EXPORT_API" />
+			<arg value="--generate_exports" /><!-- required by glslunit interna -->
+
+
 			<arg value="--only_closure_dependencies" />
 			<arg value="--use_types_for_optimization" />
 

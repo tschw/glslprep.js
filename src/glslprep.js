@@ -14,6 +14,10 @@
  */
 goog.provide('glslprep');
 
+/** @define {boolean} */
+goog.define('glslprep.EXPORT_API', false);
+
+
 goog.require('glslunit.glsl.parser');
 
 goog.require('glslunit.compiler.Compiler');
@@ -40,27 +44,19 @@ goog.scope(function() {
 	var $CompilerPhase = $Compiler.CompilerPhase;
 	var $Generator = glslunit.Generator;
 
-	/**
-	 * @export
-	 *
-	 * @enum {!number} 
-	 */
-	$module.Shader = { };
-	/** @export @const */
+	/** @enum {!number} */
+	$module.Shader = {};
+	/** @const */
 	$module.Shader.VERTEX = 0;
-	/** @export @const */
+	/** @const */
 	$module.Shader.FRAGMENT = 1;
 
-	/**
-	 * @export
-	 *
-	 * Exports line and column properties.
-	 */
+
+	// Exports 'line' and 'column' properties.
 	$module.SyntaxError = $SyntaxError;
 
+
 	/**
-	 * @export
-	 *
 	 * @param {!string} source
 	 * @param {!$module.Shader} type
 	 * @return {!*} AST
@@ -74,9 +70,8 @@ goog.scope(function() {
 		return /** @type {!*} */( $parse(source, startRule) );
 	};
 
+
 	/**
-	 * @export
-	 *
 	 * @param {!Array<!string>} shader
 	 *		Array with two strings holding the source code of the vertex
 	 *		and the fragment shader.
@@ -143,10 +138,26 @@ goog.scope(function() {
 		return shader;
 	};
 
+
 	/** @private @const */
 	$module.RULE_VERTEX_ = 'vertex_start';
 
 	/** @private @const */
 	$module.RULE_FRAGMENT_ = 'fragment_start';
+
+
+	if (glslprep.EXPORT_API) {
+
+		goog.exportSymbol('glslprep.SyntaxError', $module.SyntaxError);
+
+		goog.exportSymbol('glslprep.Shader', $module.Shader);
+		goog.exportProperty($module.Shader, 'VERTEX', $module.Shader.VERTEX);
+		goog.exportProperty($module.Shader, 'FRAGMENT', $module.Shader.FRAGMENT);
+
+		goog.exportSymbol('glslprep.parseGlsl', $module.parseGlsl);
+
+		goog.exportSymbol('glslprep.minifyGlsl', $module.minifyGlsl);
+
+	}
 
 });
