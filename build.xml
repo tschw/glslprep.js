@@ -5,7 +5,7 @@
 	<property name="outfile" value="${basedir}/${prjname}.min.js" />
 
 	<property name="srcdir" value="${basedir}/src" />
-	<property name="prefixfile" value="${srcdir}/prefix.js" />
+	<property name="wrapfile" value="${srcdir}/wrapper.js.txt" />
 
 	<target name="clean" description="delete build output">
 
@@ -16,13 +16,13 @@
 
 	<target name="build">
 
-		<tempfile property="temp.file" />
-
 		<java jar="${basedir}/tools/closure-compiler.jar" failonerror="true" fork="true">
 
-			<arg line="--js_output_file ${temp.file}" />
 			<arg line="--closure_entry_point ${entry}" />
 			<arg value="--js"/><arg file="${srcdir}/**.js"/>
+
+			<arg line="--js_output_file ${outfile}" />
+			<arg value="--output_wrapper_file"/><arg file="${wrapfile}" />
 
 
 			<arg line="--compilation_level ADVANCED_OPTIMIZATIONS" />
@@ -44,13 +44,6 @@
 			<jvmarg line="-server -XX:+TieredCompilation" />
 
 		</java>
-
-		<concat destfile="${outfile}" eol="lf">
-			<fileset file="${prefixfile}" />
-			<fileset file="${temp.file}" />
-		</concat>
-
-		<delete file="${temp.file}" />
 
 	</target>
 
