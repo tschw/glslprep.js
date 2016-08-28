@@ -19,7 +19,7 @@ goog.require('glslunit.VariableScopeVisitor');
 glslunit.TypeAnnotator = function(rootNode) {
   this.rootNode_ = rootNode;
 
-  this.typeMap_ = {}''
+  this.typeMap_ = {};
 };
 goog.inherits(glslunit.TypeAnnotator, glslunit.VariableScopeVisitor);
 

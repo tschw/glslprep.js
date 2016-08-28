@@ -171,15 +171,26 @@ glslunit.compiler.Preprocessor.RE_OVERRIDE_ =
 
 
 /**
+ * Regular expression for parsing GLSL diagnostic messages.
+ * @type {RegExp}
+ * @const
+ * @private
+ */
+glslunit.compiler.Preprocessor.RE_GLSL_DIAGNOSTICS_ =
+  /^(Error|Warning):(\d+):(?:\d+): (.*)$/gm;
+
+/**
  * Given a source file and a map of library files, parses the source file into
  *      the object that stores information on how to compile and output this
  *      shader class.
  * @param {string} fileName The name of the file to parse.
  * @param {!Object.<string, string>} libraryFiles A map of filenames to the
  *     contents of the file for all glsl files.
+ * @param {boolean=} runOptimizer
  * @return {glslunit.compiler.ShaderProgram} The parsed program data.
  */
-glslunit.compiler.Preprocessor.ParseFile = function(fileName, libraryFiles) {
+glslunit.compiler.Preprocessor.ParseFile =
+    function(fileName, libraryFiles, runOptimizer) {
   var vertexSourceMap = [], fragmentSourceMap = [];
   var provideFileMap = {};
   for (var libraryFileName in libraryFiles) {
@@ -203,26 +214,7 @@ glslunit.compiler.Preprocessor.ParseFile = function(fileName, libraryFiles) {
       fileName, libraryFiles, provideFileMap, includedFiles,
       vertexSourceMap, fragmentSourceMap);
   result.includedFiles = includedFiles;
-  try {
-    result.vertexAst =
-        glslunit.glsl.parser.parse(result.originalVertexSource, 'vertex_start');
-  } catch (e) {
-    throw glslunit.compiler.Preprocessor.FormatParseError_(e,
-                                                           'vertex',
-                                                           vertexSourceMap,
-                                                           libraryFiles);
-  }
-  try {
-    result.fragmentAst =
-        glslunit.glsl.parser.parse(
-            result.originalFragmentSource,
-            'fragment_start');
-  } catch (e) {
-    throw glslunit.compiler.Preprocessor.FormatParseError_(e,
-                                                           'fragment',
-                                                           fragmentSourceMap,
-                                                           libraryFiles);
-  }
+
   var licenseSet = {};
   var match;
   var completeSource = result.originalVertexSource +
@@ -234,10 +226,90 @@ glslunit.compiler.Preprocessor.ParseFile = function(fileName, libraryFiles) {
       result.licenses.push(match[0]);
     }
   }
+
+  var vertexSourceCode = result.originalVertexSource;
+  var fragmentSourceCode = result.originalFragmentSource;
+
+  var optimizationFailed = false;
+
+  if (runOptimizer) {
+
+    var glsl_optimizer = require('./glsl-optimizer');
+    var optimize = glsl_optimizer['cwrap'](
+        'optimize_glsl', 'string', [ 'string', 'number', 'number' ] );
+
+    vertexSourceCode =
+        parseDiagnostics( optimize( vertexSourceCode, 1, 1 ),
+                          vertexSourceMap );
+
+    fragmentSourceCode =
+        parseDiagnostics( optimize( fragmentSourceCode, 1, 0 ),
+                          fragmentSourceMap );
+
+    if (optimizationFailed)
+      throw Error( "Optimization pass failed." );
+
+    vertexSourceMap = null;
+    fragmentSourceMap = null;
+
+  }
+
+  var sourceCode = result.originalVertexSource;
+
+  try {
+
+    result.vertexAst =
+        glslunit.glsl.parser.parse(vertexSourceCode, 'vertex_start');
+
+  } catch (e) {
+
+    throw glslunit.compiler.Preprocessor.FormatParseError_(e, 'vertex',
+                                                           vertexSourceMap,
+                                                           fragmentSourceCode,
+                                                           libraryFiles);
+  }
+
+  sourceCode = result.originalFragmentSource;
+
+  try {
+
+    result.fragmentAst =
+        glslunit.glsl.parser.parse(fragmentSourceCode, 'fragment_start');
+
+  } catch (e) {
+    throw glslunit.compiler.Preprocessor.FormatParseError_(e, 'fragment',
+                                                           fragmentSourceMap,
+                                                           fragmentSourceCode,
+                                                           libraryFiles);
+  }
+
   result.defaultProgramShortNames();
   return result;
+
+  function parseDiagnostics( output, sourceMap ) {
+
+    var result = output.replace( glslunit.compiler.Preprocessor.RE_GLSL_DIAGNOSTICS_,
+        function( match, type, lineNumber, message, offset, input ) {
+
+      if (type === 'Error') optimizationFailed = true;
+      var where = sourceMap[lineNumber - 1];
+
+      console.log( where.fileName + ":" + (where.localLine + 1) + ": " +
+          type + ": " + message );
+
+      return '';
+    } );
+
+    return result;
+
+  }
+
 };
 
+glslunit.compiler.Preprocessor.Optimize_ =
+    function( program, vertexSourceMap, fragmentSourceMap ) {
+
+};
 
 /**
  * Parses a PEG.js exception and uses the source map to format text for a new
@@ -245,8 +317,9 @@ glslunit.compiler.Preprocessor.ParseFile = function(fileName, libraryFiles) {
  * @param {{message: string, line: number, column: number}} exception The
  *     exception thrown during parsing.
  * @param {string} shaderType The type of shader that had an error.
- * @param {!Array.<{fileName: string, localLine: number}>} sourceMap The source
+ * @param {?Array.<{fileName: string, localLine: number}>} sourceMap The source
  *     map for shader that had the error.
+ * @param {?string} sourceCode
  * @param {!Object.<string, string>} libraryFiles A map of filenames to the
  *     contents of the file for library files.
  * @return {Error} The exception with a formatted message.
@@ -255,15 +328,33 @@ glslunit.compiler.Preprocessor.ParseFile = function(fileName, libraryFiles) {
 glslunit.compiler.Preprocessor.FormatParseError_ = function(exception,
                                                             shaderType,
                                                             sourceMap,
+                                                            sourceCode,
                                                             libraryFiles) {
+
   var result = 'Error while parsing the ' + shaderType + ' shader code\n';
-  var errorLocation = sourceMap[exception.line - 1];
-  result += errorLocation.fileName + ' ' +
-      (errorLocation.localLine + 1) + ':' + exception.message + '\n' +
-      libraryFiles[errorLocation.fileName].
-          split('\n')[errorLocation.localLine] + '\n' +
-          (new Array(exception.column).join(' ')) + '^';
-  return new Error(result);
+
+  if (sourceMap) {
+    var errorLocation = sourceMap[exception.line - 1];
+
+    result += errorLocation.fileName + ' ' +
+        (errorLocation.localLine + 1) + ':' + exception.message + '\n' +
+        libraryFiles[errorLocation.fileName].
+            split('\n')[errorLocation.localLine] + '\n' +
+            (new Array(exception.column).join(' ')) + '^';
+
+  } else {
+
+    result += '<optimized code>:' + exception.line + ':' +
+        exception.message + "\n\nSource code:\n\n";
+
+    var lines = sourceCode.split(/\r?\n/g);
+    for ( var i = 1; i <= lines.length; ++i)
+      result += i + ": " + lines[i-1] + "\n";
+
+  }
+
+  return Error(result);
+
 };
 
 

@@ -1,163 +1,215 @@
-/* Copyright 2015 Tobias Schwinger
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+// Copyright 2011 Google Inc. All Rights Reserved.
+
+/**
+ * @fileoverview Preprocesses .glsl and .glslib files for use in the compiler.
+ *     Takes in the contents of a glsl file and all known library files.
+ * @author rowillia@google.com (Roy Williams)
+ * @suppress {missingProperties}
  */
+
+// Based on glslunit.compiler.TemplateCompiler
+
 goog.provide('glslprep');
 
-/** @define {boolean} */
-goog.define('glslprep.EXPORT_API', false);
-
-
-goog.require('glslunit.glsl.parser');
-
-goog.require('glslunit.compiler.Compiler');
-goog.require('glslunit.compiler.GlslPreprocessor');
-
+goog.require('Mustache');
 goog.require('glslunit.compiler.BraceReducer');
+goog.require('glslunit.compiler.Compiler');
 goog.require('glslunit.compiler.ConstructorMinifier');
 goog.require('glslunit.compiler.DeadFunctionRemover');
 goog.require('glslunit.compiler.DeclarationConsolidation');
 goog.require('glslunit.compiler.FunctionMinifier');
-goog.require('glslunit.compiler.ShaderProgram');
+goog.require('glslunit.compiler.Preprocessor');
 goog.require('glslunit.compiler.VariableMinifier');
+goog.require('goog.node.FLAGS');
+goog.require('goog.object');
 
-goog.require('glslunit.Generator');
+goog.node.FLAGS.define_string('input', undefined, 'The input file in GLSL.');
+goog.node.FLAGS.define_string('output', '', 'The output js file.');
+goog.node.FLAGS.define_string('template', '',
+                              'The output shader source code file.');
+goog.node.FLAGS.define_string('glsl_include_prefix', '',
+    'Compiler will try prefixing this flag to the path of glsllib files. If ' +
+    'not found there use ones in current directory.');
+goog.node.FLAGS.define_string_array('template_include_prefix', [],
+    'Compiler will try prefixing this flag to the path of template files. If ' +
+    'not found there use ones in current directory.');
 
-goog.scope(function() {
+goog.node.FLAGS.define_bool('remove_dead_functions', true,
+    'Compiler will remove any functions it determines to be dead.');
+goog.node.FLAGS.define_string('variable_renaming', 'ALL',
+    'The level at which the compiler will minify variable names.  ALL will ' +
+    'minify all variable names, including uniforms and attributes but can ' +
+    'also output a map of old names to new names.  INTERNAL will only minify' +
+    'variables that aren\'t exposed to JavaScript.  OFF won\'t minify any ' +
+    'variables.');
+goog.node.FLAGS.define_string('consolidate_declarations', 'ALL',
+    'The level at which the compiler will consolidate declarations.  ALL ' +
+    'will consolidate all declarations, including attributes (this can ' +
+    'change the values returned by getAttribLocation).  INTERNAL will ' +
+    'consolidate all variables with the exception of attributes.  OFF won\'t' +
+    'consolidate any attributes.');
+goog.node.FLAGS.define_bool('run_optimizer', true,
+  'Run emscripten-compiled glsl-optimizer');
+goog.node.FLAGS.define_bool('function_renaming', true,
+    'Compiler will minify all function names.');
+goog.node.FLAGS.define_bool('remove_braces', true,
+    'Remove all braces that aren\'t required.');
+goog.node.FLAGS.define_bool('minify_constructors', true,
+    'Compiler will minify all constructor calls where it can by removing ' +
+    'inputs and converting types to int where possible.  For example, ' +
+    'vec4(1.0, 1.0, 1.0, 1.0) will become vec4(1).');
 
-	var $module = glslprep;
+goog.node.FLAGS.define_bool('pretty_print', false,
+    'Output pretty-printed GLSL source code.');
 
-	var $compiler = glslunit.compiler;
-	var $parse = glslunit.glsl.parser.parse;
-	var $SyntaxError = glslunit.glsl.parser.SyntaxError;
-	var $Compiler= $compiler.Compiler;
-	var $CompilerPhase = $Compiler.CompilerPhase;
-	var $Generator = glslunit.Generator;
+goog.node.FLAGS.define_string_array('template_property', [],
+    'Properties to be passed down to template for rendering.');
 
-	/** @enum {!number} */
-	$module.Shader = {};
-	/** @const */
-	$module.Shader.VERTEX = 0;
-	/** @const */
-	$module.Shader.FRAGMENT = 1;
-
-
-	// Exports 'line' and 'column' properties.
-	$module.SyntaxError = $SyntaxError;
-
-
-	/**
-	 * @param {!string} source
-	 * @param {!$module.Shader} type
-	 * @return {!*} AST
-	 * @throws {$SyntaxError|Error}
-	 */
-	$module.parseGlsl = function(source, type) {
-
-		var startRule = type === $module.Shader.VERTEX ?
-				$module.RULE_VERTEX_ : $module.RULE_FRAGMENT_;
-
-		return /** @type {!*} */( $parse(source, startRule) );
-	};
-
-
-	/**
-	 * @param {!Array<!string>} shader
-	 *		Array with two strings holding the source code of the vertex
-	 *		and the fragment shader.
-	 * @param {Object<!string,?string>=} opt_defines
-	 * 		Preprocessor definitions. Preprocessing is only performed
-	 * 		when given.
-	 * @return {!Array<!string>|!string}
-	 * 		Input array with minified source code or error string.
-	 * @throws {$SyntaxError|Error}
-	 */
-	$module.minifyGlsl = function(shader, opt_defines) {
-
-		var shaderProgram = new $compiler.ShaderProgram();
-
-		shaderProgram.vertexAst = $parse(shader[0], $module.RULE_VERTEX_);
-		shaderProgram.fragmentAst = $parse(shader[1], $module.RULE_FRAGMENT_);
-
-		shaderProgram.defaultProgramShortNames();
-
-		var compiler = new $Compiler(shaderProgram);
-
-		if (goog.isDefAndNotNull(opt_defines)) {
-
-			var defs = [ "GL_ES 1" ];
-			var modes = [];
-
-			for (var name in opt_defines) {
-				var body = opt_defines[name];
-
-				if (goog.isDefAndNotNull(body))
-					defs.push(name + " " + body);
-				else
-					modes.push(name);
-			}
-
-			compiler.registerStep(
-					$CompilerPhase.MINIFICATION, 
-					new $compiler.GlslPreprocessor(modes, defs, false, false) );
-		}
-
-		compiler.registerStep(
-				$CompilerPhase.MINIFICATION, new $compiler.DeadFunctionRemover());
-
-		compiler.registerStep(
-				$CompilerPhase.MINIFICATION, new $compiler.DeclarationConsolidation(true));
-
-		compiler.registerStep(
-				$CompilerPhase.MINIFICATION, new $compiler.VariableMinifier(false));
-
-		compiler.registerStep(
-				$CompilerPhase.MINIFICATION, new $compiler.FunctionMinifier());
-
-		compiler.registerStep(
-				$CompilerPhase.MINIFICATION, new $compiler.BraceReducer());
-
-		compiler.registerStep(
-				$CompilerPhase.MINIFICATION, new $compiler.ConstructorMinifier());
-
-		shaderProgram = compiler.compileProgram();
-
-		shader[0] = $Generator.getSourceCode(shaderProgram.vertexAst);
-		shader[1] = $Generator.getSourceCode(shaderProgram.fragmentAst);
-
-		return shader;
-	};
+goog.node.FLAGS.parseArgs();
 
 
-	/** @private @const */
-	$module.RULE_VERTEX_ = 'vertex_start';
+/**
+ * Set of valid GLSL extensions.
+ * @type {Object.<string, boolean>}
+ * @const
+ */
+var GLSL_EXTENSIONS = {
+  '.glsl': true,
+  '.glsllib': true
+};
 
-	/** @private @const */
-	$module.RULE_FRAGMENT_ = 'fragment_start';
+
+/**
+ * Loads all of the files under inputDir and any subdirectories contained in
+ * prefixes.
+ * @param {string} inputDir The directory of the input file.
+ * @param {Array.<string>} prefixes The prefixes of other directories to load
+ *      files from.
+ * @param {function(string):boolean=} filterFunction to filter files to load.
+ * @return {!Object.<string, string>} Map of filenames to their contents.
+ */
+function loadFiles(inputDir, prefixes, filterFunction) {
+  var directories = [inputDir];
+  filterFunction = filterFunction || function(x) {return true;};
+  if (prefixes) {
+    prefixes.forEach(function(prefix) {
+      directories.push(path.join(inputDir, prefix));
+    });
+  }
+  var result = {};
+  directories.forEach(function(dir) {
+    var files = fs.readdirSync(dir).filter(function(fileOrDir) {
+          return !fs.statSync(path.join(dir, fileOrDir)).isDirectory() &&
+              filterFunction(fileOrDir);
+        });
+    files.forEach(function(fileName) {
+      result[fileName] = fs.readFileSync(path.join(dir, fileName), 'utf8');
+    });
+  });
+  return result;
+}
 
 
-	if (glslprep.EXPORT_API) {
+function main() {
+  var inputDir = path.dirname(goog.node.FLAGS.input);
+  var shaderDirectories = [inputDir];
+  var shaderFiles = loadFiles(inputDir, goog.node.FLAGS.glsl_include_prefix,
+      function(x) {
+    return path.extname(x) in GLSL_EXTENSIONS;
+  });
+  var templateFiles = loadFiles(inputDir,
+                                goog.node.FLAGS.template_include_prefix);
 
-		goog.exportSymbol('glslprep.SyntaxError', $module.SyntaxError);
+  var start = new Date().getTime();
+  try {
+    var shaderProgram = glslunit.compiler.Preprocessor.ParseFile(
+        path.basename(goog.node.FLAGS.input),
+        shaderFiles, goog.node.FLAGS.run_optimizer);
+  } catch (e) {
+    console.error(e.message);
+    process.exit(1);
+  }
+  var finish = new Date().getTime();
 
-		goog.exportSymbol('glslprep.Shader', $module.Shader);
-		goog.exportProperty($module.Shader, 'VERTEX', $module.Shader.VERTEX);
-		goog.exportProperty($module.Shader, 'FRAGMENT', $module.Shader.FRAGMENT);
+  start = new Date().getTime();
+  var compiler = new glslunit.compiler.Compiler(shaderProgram);
 
-		goog.exportSymbol('glslprep.parseGlsl', $module.parseGlsl);
+  var all_internal_map = {
+    'ALL': true,
+    'INTERNAL': false
+  };
 
-		goog.exportSymbol('glslprep.minifyGlsl', $module.minifyGlsl);
+  if (goog.node.FLAGS.remove_dead_functions) {
+    compiler.registerStep(glslunit.compiler.Compiler.CompilerPhase.MINIFICATION,
+        new glslunit.compiler.DeadFunctionRemover());
+  }
+  if (goog.node.FLAGS.remove_braces) {
+    compiler.registerStep(glslunit.compiler.Compiler.CompilerPhase.MINIFICATION,
+        new glslunit.compiler.BraceReducer());
+  }
+  if (goog.node.FLAGS.variable_renaming in all_internal_map) {
+    compiler.registerStep(glslunit.compiler.Compiler.CompilerPhase.MINIFICATION,
+        new glslunit.compiler.VariableMinifier(
+            all_internal_map[goog.node.FLAGS.variable_renaming]));
+  }
+  if (goog.node.FLAGS.consolidate_declarations in all_internal_map) {
+    compiler.registerStep(glslunit.compiler.Compiler.CompilerPhase.MINIFICATION,
+        new glslunit.compiler.DeclarationConsolidation(
+            all_internal_map[goog.node.FLAGS.consolidate_declarations]));
+  }
+  if (goog.node.FLAGS.function_renaming) {
+    compiler.registerStep(glslunit.compiler.Compiler.CompilerPhase.MINIFICATION,
+        new glslunit.compiler.FunctionMinifier());
+  }
+  if (goog.node.FLAGS.minify_constructors) {
+    compiler.registerStep(glslunit.compiler.Compiler.CompilerPhase.MINIFICATION,
+        new glslunit.compiler.ConstructorMinifier());
+  }
+  shaderProgram = compiler.compileProgram();
+  shaderProgram.prettyPrint = goog.node.FLAGS.pretty_print;
 
-	}
+  finish = new Date().getTime();
 
-});
+  var templateProperties = {};
+  goog.node.FLAGS.template_property.forEach(function(property) {
+    var keyVal = property.split('=', 2);
+    if (keyVal.length != 2) {
+      console.error('Invalid template property: ' + property);
+      process.exit(1);
+    }
+    templateProperties[keyVal[0]] = keyVal[1];
+  });
+  shaderProgram.templateProperties = templateProperties;
+
+  var output = '';
+  if (shaderProgram.template || goog.node.FLAGS.template) {
+    var template_source = '';
+    if (shaderProgram.template) {
+      template_source = templateFiles[shaderProgram.template];
+      if (!template_source) {
+        console.error('Could not find template ' + shaderProgram.template);
+        process.exit(1);
+      }
+    } else {
+      template_source = fs.readFileSync(goog.node.FLAGS.template, 'utf8');
+    }
+    shaderProgram.defaultProgramShortNames();
+    output = Mustache.to_html(template_source, shaderProgram) + '\n';
+  } else {
+    output =
+       '\n//! VERTEX\n' +
+        glslunit.Generator.getSourceCode(shaderProgram.vertexAst,
+                                         '\\n') +
+        '\n//! FRAGMENT\n' +
+        glslunit.Generator.getSourceCode(shaderProgram.fragmentAst,
+                                         '\\n');
+  }
+  if (goog.node.FLAGS.output) {
+    fs.writeFileSync(goog.node.FLAGS.output, output);
+  } else {
+    process.stdout.write(output);
+  }
+}
+
+main();
+

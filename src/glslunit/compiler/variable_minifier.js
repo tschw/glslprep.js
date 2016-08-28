@@ -137,7 +137,6 @@ glslunit.compiler.VariableMinifier.prototype.beforeTransformRoot =
       }
     }
   }
-  this.pushStack_(node);
   goog.array.forEach(localGlobals, function(globalName) {
     this.currentNameGenerator_.shortenSymbol(globalName);
   }, this);
@@ -222,15 +221,6 @@ glslunit.compiler.VariableMinifier.prototype.beforeTransformScope =
  * @export
  */
 glslunit.compiler.VariableMinifier.prototype.afterTransformScope =
-  glslunit.compiler.VariableMinifier.prototype.popStack_;
-
-
-/**
- * Track the max ID after transforming the root, but don't
- * @param {!Object} node The node to transform.
- * @export
- */
-glslunit.compiler.VariableMinifier.prototype.afterTransformRoot =
   glslunit.compiler.VariableMinifier.prototype.popStack_;
 
 

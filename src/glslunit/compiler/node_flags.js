@@ -151,7 +151,6 @@ goog.node.arrayCommandLineFlag.prototype.getTypeHelp = function() {
 
 /**
  * Sets the current value for this flag.
- * @param {string} value The value of the flag.
  */
 goog.node.arrayCommandLineFlag.prototype.parseValue = function(value) {
   if (!goog.isDef(this.value)) {
@@ -313,14 +312,16 @@ goog.node.FLAGS.parseArgs = function() {
     // If this is the last parameter being parsed, and we haven't set a flag,
     // attempt to parse the last parameter as a boolean flag.
     if (index == array.length - 1 && lastParam && lastParamIsFlag && !flag) {
-      var boolFlag = goog.node.FLAGS.parseSingleBooleanFlag_(lastParam);
+      var boolFlag = goog.node.FLAGS.parseSingleBooleanFlag_(
+				/** @type{!string} */( lastParam ) );
       flag = boolFlag.flag;
       flagValue = boolFlag.flagValue;
     }
     if (flag && flagValue) {
       flag = flag.slice(2);
       if (flag in goog.node.FLAGS.definedFlags_) {
-        goog.node.FLAGS.definedFlags_[flag].parseValue(flagValue);
+        goog.node.FLAGS.definedFlags_[flag].parseValue(
+				/** @type {!Object} */ ( flagValue ) );
         lastParam = null;
       } else {
         console.error('Unknown flag ' + flag);

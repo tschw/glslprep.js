@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title>glslprep demo / smoke test</title>
+		<title>glslminify demo / smoke test</title>
 		<meta charset="utf-8"></meta>
 		<style>
 			body { text-align: center; }
@@ -19,11 +19,11 @@
 		<script src="src/goog/deps.js"></script>
 		<script>
 			goog.ENABLE_DEBUG_LOADER = true;
-			goog.require('glslprep');
+			goog.require('glslminify');
 		</script>
 -->
 <!-- -->
-		<script src="glslprep.min.js"></script>
+		<script src="glslminify.min.js"></script>
 <!-- -->
 	</head>
 	<body>
@@ -77,11 +77,11 @@
 
 				try {
 
-					glslprep.minifyGlsl(shader, defines);
+					glslminify.minifyGlsl(shader, defines);
 
 				} catch (e) {
 
-					if (e instanceof glslprep.SyntaxError)
+					if (e instanceof glslminify.SyntaxError)
 						window.alert(e.line + ":" + e.column + ": " + e.message);
 					else {
 						console.error(e.stack || e);
@@ -89,8 +89,8 @@
 					}
 				}
 
-				document.getElementsByName('vertexShaderOut')[0].value = shader[glslprep.Shader.VERTEX];
-				document.getElementsByName('fragmentShaderOut')[0].value = shader[glslprep.Shader.FRAGMENT];
+				document.getElementsByName('vertexShaderOut')[0].value = shader[glslminify.Shader.VERTEX];
+				document.getElementsByName('fragmentShaderOut')[0].value = shader[glslminify.Shader.FRAGMENT];
 			}
 
 			run();

@@ -1,55 +1,41 @@
 <project name="glslprep" basedir="." default="build">
 
-	<property name="entry" value="glslprep" />
-	<property name="prjname" value="${ant.project.name}" />
-	<property name="outfile" value="${basedir}/${prjname}.min.js" />
+	<target name="build" description="build all" depends="library,minifier" />
 
 	<property name="srcdir" value="${basedir}/src" />
-	<property name="wrapfile" value="${srcdir}/wrapper.js.txt" />
+	<property name="js_codebase" value="${srcdir}" />
 
 	<target name="clean" description="delete build output">
-
-		<delete file="${outfile}"/>
-
+		<delete file="${basedir}/${ant.project.name}.min.js" />
 	</target>
 
+	<target name="library">
+		<compile-js
+				entry-point="glslminify"
+				output-file="${basedir}/glslminify.min.js">
 
-	<target name="build">
-
-		<java jar="${basedir}/tools/closure-compiler.jar" failonerror="true" fork="true">
-
-			<arg line="--closure_entry_point ${entry}" />
-			<arg value="--js"/><arg file="${srcdir}/**.js"/>
-
-			<arg line="--js_output_file ${outfile}" />
-			<arg value="--output_wrapper_file"/><arg file="${wrapfile}" />
-
+			<arg line="--define glslminify.EXPORT_API" />
+			<arg value="--output_wrapper_file" /><arg file="${srcdir}/glslminify.wrapper.txt" />
 
 			<arg line="--compilation_level ADVANCED_OPTIMIZATIONS" />
-
-			<arg line="--define glslprep.EXPORT_API" />
-			<arg value="--generate_exports" /><!-- required by glslunit interna -->
-
-
-			<arg value="--only_closure_dependencies" />
 			<arg value="--use_types_for_optimization" />
 
-
-			<arg line="--warning_level VERBOSE --summary_detail_level 3" />
-
-			<arg prefix="--jscomp_error=" 
-					line="accessControls checkTypes" />
-
-			<arg prefix="--jscomp_warning="
-					line="inferredConstCheck missingProperties typeInvalidation undefinedNames" />
-
-
-			<jvmarg line="-server -XX:+TieredCompilation" />
-
-		</java>
-
+		</compile-js>
 	</target>
 
+	<target name="minifier">
+		<compile-js
+				entry-point="glslprep"
+				output-file="${basedir}/glslprep.js">
+
+			<arg prefix="--jscomp_off=" line="es5Strict undefinedNames" />
+
+			<arg value="--output_wrapper_file" /><arg file="${srcdir}/glslprep.wrapper.txt" />
+			<arg value="--use_types_for_optimization" />
+			<arg prefix="--externs=externs/" line="node_common.js" />
+
+		</compile-js>
+	</target>
 
 	<target name="debug-deps">
 
@@ -63,5 +49,37 @@
 
 	</target>
 
+	<macrodef name="compile-js">
+		<attribute name="entry-point" />
+		<attribute name="output-file" />
+		<element name="extra" optional="true" implicit="true" />
+		<sequential>
+
+			<java jar="${basedir}/tools/closure-compiler.jar"
+					failonerror="true" fork="true">
+
+				<arg value="--js" /><arg file="${srcdir}/**.js" />
+				<arg value="--js_output_file" /><arg file="@{output-file}" />
+				<arg value="--closure_entry_point" /><arg value="@{entry-point}" />
+
+				<arg value="--generate_exports" /><!-- required by glslunit interna -->
+				<arg value="--only_closure_dependencies" />
+
+				<arg line="--warning_level VERBOSE --summary_detail_level 3" />
+
+				<arg prefix="--jscomp_error="
+						line="accessControls checkTypes" />
+
+				<arg prefix="--jscomp_warning="
+						line="inferredConstCheck missingProperties typeInvalidation undefinedNames" />
+
+				<jvmarg line="-server -XX:+TieredCompilation" />
+
+				<extra />
+
+			</java>
+
+		</sequential>
+	</macrodef>
 
 </project>

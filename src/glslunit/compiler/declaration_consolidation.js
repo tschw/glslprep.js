@@ -20,13 +20,13 @@ goog.require('goog.array');
 
 /**
  * Optimizer consolidates declarations of variables into the same line.
- * @param {boolean} consolidateAttributes Whether or not to consolidate
- *     attributes.
+ * @param {boolean} consolidateInterface Whether or not to consolidate
+ *     attributes and uniforms.
  * @constructor
  * @extends {glslunit.ASTTransformer}
  * @implements {glslunit.compiler.CompilerStep}
  */
-glslunit.compiler.DeclarationConsolidation = function(consolidateAttributes) {
+glslunit.compiler.DeclarationConsolidation = function(consolidateInterface) {
   goog.base(this);
 
   /**
@@ -70,11 +70,12 @@ glslunit.compiler.DeclarationConsolidation = function(consolidateAttributes) {
   this.structDeclaratorNodes_ = [];
 
   /**
-   * Whether or not to consolidate attribute values.
+   * Whether or not to consolidate attribute and uniform variables.
    * @type {boolean}
    * @private
    */
-  this.consolidateAttributes_ = consolidateAttributes;
+  this.consolidateInterface_ = consolidateInterface;
+
 };
 goog.inherits(glslunit.compiler.DeclarationConsolidation,
               glslunit.ASTTransformer);
@@ -219,12 +220,13 @@ glslunit.compiler.DeclarationConsolidation.prototype.
     shouldConsolidateDeclarator_ = function(declarator, isGlobal) {
   var typeStr = glslunit.Generator.getSourceCode(declarator.typeAttribute);
   var declarator_items = null;
+  var quali = declarator.typeAttribute.qualifier;
   if (this.typeMapStack_.length > 0) {
     declarator_items = this.typeMapStack_.slice(-1)[0][typeStr];
   }
   return (declarator != null &&
-          (this.consolidateAttributes_ ||
-              declarator.typeAttribute.qualifier != 'attribute') &&
+          (this.consolidateInterface_ || quali != 'attribute') &&
+		  (this.consolidateInterface_ || quali != 'uniform') &&
           declarator.typeAttribute.qualifier != 'const' &&
           (!declarator_items || declarator_items.length > 1) &&
           !(declarator.id in this.forInitializerNodes_) &&
@@ -349,9 +351,9 @@ glslunit.compiler.DeclarationConsolidation.prototype.getDependencies =
 glslunit.compiler.DeclarationConsolidation.prototype.performStep =
     function(stepOutputMap, shaderProgram) {
   var vertexTransformer = new glslunit.compiler.DeclarationConsolidation(
-      this.consolidateAttributes_);
+      this.consolidateInterface_);
   var fragmentTransformer = new glslunit.compiler.DeclarationConsolidation(
-      this.consolidateAttributes_);
+      this.consolidateInterface_);
   shaderProgram.vertexAst =
       vertexTransformer.transformNode(shaderProgram.vertexAst);
   shaderProgram.fragmentAst =
