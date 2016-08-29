@@ -1,5 +1,5 @@
-Only in ../../glslunit.orig/: .npmignore
-diff -ur ../../glslunit.orig/ast/glsl_parser.js glslunit/ast/glsl_parser.js
+Only in ../../glslunit.orig: .npmignore
+diff -ru ../../glslunit.orig/ast/glsl_parser.js glslunit/ast/glsl_parser.js
 --- ../../glslunit.orig/ast/glsl_parser.js	2012-02-28 07:51:52.000000000 +0100
 +++ glslunit/ast/glsl_parser.js	2015-07-12 10:14:08.973335347 +0200
 @@ -3,17 +3,21 @@
@@ -70,7 +70,7 @@ diff -ur ../../glslunit.orig/ast/glsl_parser.js glslunit/ast/glsl_parser.js
 -})();
 +  $module.SyntaxError.prototype = Error.prototype;
 +});
-diff -ur ../../glslunit.orig/ast/transformers/glsl_ast_transformer.js glslunit/ast/transformers/glsl_ast_transformer.js
+diff -ru ../../glslunit.orig/ast/transformers/glsl_ast_transformer.js glslunit/ast/transformers/glsl_ast_transformer.js
 --- ../../glslunit.orig/ast/transformers/glsl_ast_transformer.js	2012-05-04 20:42:54.000000000 +0200
 +++ glslunit/ast/transformers/glsl_ast_transformer.js	2015-07-12 09:02:18.654120680 +0200
 @@ -44,7 +44,7 @@
@@ -82,9 +82,9 @@ diff -ur ../../glslunit.orig/ast/transformers/glsl_ast_transformer.js glslunit/a
     * @private
     */
    this.mixed_in_visitors_ = [];
-diff -ur ../../glslunit.orig/ast/visitors/type_annotator.js glslunit/ast/visitors/type_annotator.js
+diff -ru ../../glslunit.orig/ast/visitors/type_annotator.js glslunit/ast/visitors/type_annotator.js
 --- ../../glslunit.orig/ast/visitors/type_annotator.js	2012-05-04 20:42:54.000000000 +0200
-+++ glslunit/ast/visitors/type_annotator.js	2016-08-19 13:12:08.104255893 +0200
++++ glslunit/ast/visitors/type_annotator.js	2016-08-28 14:24:50.813364499 +0200
 @@ -19,7 +19,7 @@
  glslunit.TypeAnnotator = function(rootNode) {
    this.rootNode_ = rootNode;
@@ -94,7 +94,7 @@ diff -ur ../../glslunit.orig/ast/visitors/type_annotator.js glslunit/ast/visitor
  };
  goog.inherits(glslunit.TypeAnnotator, glslunit.VariableScopeVisitor);
  
-diff -ur ../../glslunit.orig/ast/visitors/variable_scope_visitor.js glslunit/ast/visitors/variable_scope_visitor.js
+diff -ru ../../glslunit.orig/ast/visitors/variable_scope_visitor.js glslunit/ast/visitors/variable_scope_visitor.js
 --- ../../glslunit.orig/ast/visitors/variable_scope_visitor.js	2012-05-04 20:42:54.000000000 +0200
 +++ glslunit/ast/visitors/variable_scope_visitor.js	2015-07-12 09:02:18.655120680 +0200
 @@ -67,14 +67,14 @@
@@ -114,8 +114,8 @@ diff -ur ../../glslunit.orig/ast/visitors/variable_scope_visitor.js glslunit/ast
     * @private
     */
    this.currentFrame_ = [];
-Only in ../../glslunit.orig/: bin
-diff -ur ../../glslunit.orig/compiler/constructor_minifier.js glslunit/compiler/constructor_minifier.js
+Only in ../../glslunit.orig: bin
+diff -ru ../../glslunit.orig/compiler/constructor_minifier.js glslunit/compiler/constructor_minifier.js
 --- ../../glslunit.orig/compiler/constructor_minifier.js	2012-05-04 20:42:55.000000000 +0200
 +++ glslunit/compiler/constructor_minifier.js	2015-07-12 09:02:18.655120680 +0200
 @@ -56,14 +56,14 @@
@@ -135,9 +135,9 @@ diff -ur ../../glslunit.orig/compiler/constructor_minifier.js glslunit/compiler/
  };
  
  
-diff -ur ../../glslunit.orig/compiler/declaration_consolidation.js glslunit/compiler/declaration_consolidation.js
+diff -ru ../../glslunit.orig/compiler/declaration_consolidation.js glslunit/compiler/declaration_consolidation.js
 --- ../../glslunit.orig/compiler/declaration_consolidation.js	2012-05-04 20:42:55.000000000 +0200
-+++ glslunit/compiler/declaration_consolidation.js	2016-08-19 14:57:35.120570998 +0200
++++ glslunit/compiler/declaration_consolidation.js	2016-08-28 14:24:50.813364499 +0200
 @@ -20,13 +20,13 @@
  
  /**
@@ -216,7 +216,7 @@ diff -ur ../../glslunit.orig/compiler/declaration_consolidation.js glslunit/comp
    shaderProgram.vertexAst =
        vertexTransformer.transformNode(shaderProgram.vertexAst);
    shaderProgram.fragmentAst =
-diff -ur ../../glslunit.orig/compiler/glsl_preprocessor.js glslunit/compiler/glsl_preprocessor.js
+diff -ru ../../glslunit.orig/compiler/glsl_preprocessor.js glslunit/compiler/glsl_preprocessor.js
 --- ../../glslunit.orig/compiler/glsl_preprocessor.js	2012-05-04 20:42:54.000000000 +0200
 +++ glslunit/compiler/glsl_preprocessor.js	2015-07-12 09:02:18.656120680 +0200
 @@ -402,7 +402,7 @@
@@ -241,9 +241,9 @@ diff -ur ../../glslunit.orig/compiler/glsl_preprocessor.js glslunit/compiler/gls
  };
  
  
-diff -ur ../../glslunit.orig/compiler/node_flags.js glslunit/compiler/node_flags.js
+diff -ru ../../glslunit.orig/compiler/node_flags.js glslunit/compiler/node_flags.js
 --- ../../glslunit.orig/compiler/node_flags.js	2012-05-04 20:42:55.000000000 +0200
-+++ glslunit/compiler/node_flags.js	2016-08-27 22:13:09.436491502 +0200
++++ glslunit/compiler/node_flags.js	2016-08-28 14:24:50.813364499 +0200
 @@ -151,7 +151,6 @@
  
  /**
@@ -271,25 +271,35 @@ diff -ur ../../glslunit.orig/compiler/node_flags.js glslunit/compiler/node_flags
          lastParam = null;
        } else {
          console.error('Unknown flag ' + flag);
-diff -ur ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preprocessor.js
+diff -ru ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preprocessor.js
 --- ../../glslunit.orig/compiler/preprocessor.js	2012-05-04 20:42:54.000000000 +0200
-+++ glslunit/compiler/preprocessor.js	2016-08-27 22:17:20.630504013 +0200
-@@ -171,15 +171,26 @@
++++ glslunit/compiler/preprocessor.js	2016-08-29 20:53:01.867558634 +0200
+@@ -169,6 +169,24 @@
+ glslunit.compiler.Preprocessor.RE_OVERRIDE_ =
+     /\/\/!\s*OVERRIDE\s+(\S+)\s+(\S+)/;
  
- 
- /**
-+ * Regular expression for parsing GLSL diagnostic messages.
++/**
++ * Regular expression for stripping the prefix of glsl-optimizer diagnostic
++ * output.
 + * @type {RegExp}
 + * @const
 + * @private
 + */
-+glslunit.compiler.Preprocessor.RE_GLSL_DIAGNOSTICS_ =
-+  /^(Error|Warning):(\d+):(?:\d+): (.*)$/gm;
++glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAG_PREFIX_ =
++    /^Error|Warning|Info:$/gm;
 +
 +/**
++ * Regular expression for parsing glsl-optimizer diagnostic messages.
++ * @type {RegExp}
++ * @const
++ * @private
++ */
++glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAGNOSTICS_ =
++    /^\((\d+),\d+\): (error|warning|info): (.*)$/gm;
+ 
+ /**
   * Given a source file and a map of library files, parses the source file into
-  *      the object that stores information on how to compile and output this
-  *      shader class.
+@@ -177,9 +195,11 @@
   * @param {string} fileName The name of the file to parse.
   * @param {!Object.<string, string>} libraryFiles A map of filenames to the
   *     contents of the file for all glsl files.
@@ -302,10 +312,11 @@ diff -ur ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preproce
    var vertexSourceMap = [], fragmentSourceMap = [];
    var provideFileMap = {};
    for (var libraryFileName in libraryFiles) {
-@@ -203,41 +214,102 @@
+@@ -202,42 +222,106 @@
+   var result = glslunit.compiler.Preprocessor.ParseFileSource_(
        fileName, libraryFiles, provideFileMap, includedFiles,
        vertexSourceMap, fragmentSourceMap);
-   result.includedFiles = includedFiles;
+-  result.includedFiles = includedFiles;
 +
 +  var licenseSet = {};
 +  var match;
@@ -330,12 +341,14 @@ diff -ur ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preproce
 +    var optimize = glsl_optimizer['cwrap'](
 +        'optimize_glsl', 'string', [ 'string', 'number', 'number' ] );
 +
++	var version = 2; // OpenGL ES3
++
 +    vertexSourceCode =
-+        parseDiagnostics( optimize( vertexSourceCode, 1, 1 ),
++        parseDiagnostics( optimize( vertexSourceCode, version, 1 ),
 +                          vertexSourceMap );
 +
 +    fragmentSourceCode =
-+        parseDiagnostics( optimize( fragmentSourceCode, 1, 0 ),
++        parseDiagnostics( optimize( fragmentSourceCode, version, 0 ),
 +                          fragmentSourceMap );
 +
 +    if (optimizationFailed)
@@ -399,10 +412,12 @@ diff -ur ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preproce
 +
 +  function parseDiagnostics( output, sourceMap ) {
 +
-+    var result = output.replace( glslunit.compiler.Preprocessor.RE_GLSL_DIAGNOSTICS_,
-+        function( match, type, lineNumber, message, offset, input ) {
++    var result = output.replace(
++		glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAG_PREFIX_, '' ).replace(
++		glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAGNOSTICS_,
++        function( match, lineNumber, type, message, offset, input ) {
 +
-+      if (type === 'Error') optimizationFailed = true;
++      if (type === 'error') optimizationFailed = true;
 +      var where = sourceMap[lineNumber - 1];
 +
 +      console.log( where.fileName + ":" + (where.localLine + 1) + ": " +
@@ -424,7 +439,7 @@ diff -ur ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preproce
  
  /**
   * Parses a PEG.js exception and uses the source map to format text for a new
-@@ -245,8 +317,9 @@
+@@ -245,8 +329,9 @@
   * @param {{message: string, line: number, column: number}} exception The
   *     exception thrown during parsing.
   * @param {string} shaderType The type of shader that had an error.
@@ -435,7 +450,7 @@ diff -ur ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preproce
   * @param {!Object.<string, string>} libraryFiles A map of filenames to the
   *     contents of the file for library files.
   * @return {Error} The exception with a formatted message.
-@@ -255,15 +328,33 @@
+@@ -255,15 +340,33 @@
  glslunit.compiler.Preprocessor.FormatParseError_ = function(exception,
                                                              shaderType,
                                                              sourceMap,
@@ -476,7 +491,7 @@ diff -ur ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preproce
  };
  
  
-diff -ur ../../glslunit.orig/compiler/utils.js glslunit/compiler/utils.js
+diff -ru ../../glslunit.orig/compiler/utils.js glslunit/compiler/utils.js
 --- ../../glslunit.orig/compiler/utils.js	2012-05-04 20:42:55.000000000 +0200
 +++ glslunit/compiler/utils.js	2015-07-12 09:02:18.657120680 +0200
 @@ -40,10 +40,10 @@
@@ -492,9 +507,9 @@ diff -ur ../../glslunit.orig/compiler/utils.js glslunit/compiler/utils.js
    var result = [];
    goog.array.forEach(structNodes, function(structDeclarator) {
      result[structDeclarator.id] = true;
-diff -ur ../../glslunit.orig/compiler/variable_minifier.js glslunit/compiler/variable_minifier.js
+diff -ru ../../glslunit.orig/compiler/variable_minifier.js glslunit/compiler/variable_minifier.js
 --- ../../glslunit.orig/compiler/variable_minifier.js	2012-05-04 20:42:55.000000000 +0200
-+++ glslunit/compiler/variable_minifier.js	2016-08-27 21:33:21.200372561 +0200
++++ glslunit/compiler/variable_minifier.js	2016-08-28 14:24:50.813364499 +0200
 @@ -137,7 +137,6 @@
        }
      }
@@ -519,10 +534,10 @@ diff -ur ../../glslunit.orig/compiler/variable_minifier.js glslunit/compiler/var
  /**
   * Push the stack before transforming a function declaration.  We need to do
   *     this in addition pushing the stack when transforming a scope so we can
-Only in ../../glslunit.orig/: demo_site
-Only in ../../glslunit.orig/: example
-Only in ../../glslunit.orig/: executor
-diff -ur ../../glslunit.orig/glsl_generator.js glslunit/glsl_generator.js
+Only in ../../glslunit.orig: demo_site
+Only in ../../glslunit.orig: example
+Only in ../../glslunit.orig: executor
+diff -ru ../../glslunit.orig/glsl_generator.js glslunit/glsl_generator.js
 --- ../../glslunit.orig/glsl_generator.js	2016-08-18 15:07:49.495013770 +0200
 +++ glslunit/glsl_generator.js	2015-07-12 09:02:18.657120680 +0200
 @@ -297,7 +297,6 @@
@@ -813,10 +828,10 @@ diff -ur ../../glslunit.orig/glsl_generator.js glslunit/glsl_generator.js
      } else {
        addParen = true;
      }
-Only in ../../glslunit.orig/: glsl_generator_test.js
-Only in ../../glslunit.orig/: glsl_parser_test.js
-Only in ../../glslunit.orig/: glslunit_jstdadapter
-Only in ../../glslunit.orig/: package.json
-Only in ../../glslunit.orig/: testing
-Only in ../../glslunit.orig/: third-party
-Only in ../../glslunit.orig/: utils_test.js
+Only in ../../glslunit.orig: glsl_generator_test.js
+Only in ../../glslunit.orig: glsl_parser_test.js
+Only in ../../glslunit.orig: glslunit_jstdadapter
+Only in ../../glslunit.orig: package.json
+Only in ../../glslunit.orig: testing
+Only in ../../glslunit.orig: third-party
+Only in ../../glslunit.orig: utils_test.js
