@@ -49,7 +49,7 @@ goog.node.FLAGS.define_string('consolidate_declarations', 'ALL',
     'consolidate all variables with the exception of attributes.  OFF won\'t' +
     'consolidate any attributes.');
 goog.node.FLAGS.define_bool('run_optimizer', true,
-  'Run emscripten-compiled glsl-optimizer');
+    'Run emscripten-compiled glsl-optimizer');
 goog.node.FLAGS.define_bool('function_renaming', true,
     'Compiler will minify all function names.');
 goog.node.FLAGS.define_bool('remove_braces', true,
