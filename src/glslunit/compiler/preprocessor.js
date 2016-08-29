@@ -238,12 +238,14 @@ glslunit.compiler.Preprocessor.ParseFile =
     var optimize = glsl_optimizer['cwrap'](
         'optimize_glsl', 'string', [ 'string', 'number', 'number' ] );
 
+	var version = 2; // OpenGL ES3
+
     vertexSourceCode =
-        parseDiagnostics( optimize( vertexSourceCode, 1, 1 ),
+        parseDiagnostics( optimize( vertexSourceCode, version, 1 ),
                           vertexSourceMap );
 
     fragmentSourceCode =
-        parseDiagnostics( optimize( fragmentSourceCode, 1, 0 ),
+        parseDiagnostics( optimize( fragmentSourceCode, version, 0 ),
                           fragmentSourceMap );
 
     if (optimizationFailed)
