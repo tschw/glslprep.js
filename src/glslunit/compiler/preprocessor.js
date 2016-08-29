@@ -169,15 +169,24 @@ glslunit.compiler.Preprocessor.RE_JSCONST_ = /\/\/!\s*JSCONST\s+(\S+)\s+(.*)/;
 glslunit.compiler.Preprocessor.RE_OVERRIDE_ =
     /\/\/!\s*OVERRIDE\s+(\S+)\s+(\S+)/;
 
-
 /**
- * Regular expression for parsing GLSL diagnostic messages.
+ * Regular expression for stripping the prefix of glsl-optimizer diagnostic
+ * output.
  * @type {RegExp}
  * @const
  * @private
  */
-glslunit.compiler.Preprocessor.RE_GLSL_DIAGNOSTICS_ =
-  /^(Error|Warning):(\d+):(?:\d+): (.*)$/gm;
+glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAG_PREFIX_ =
+    /^Error|Warning|Info:$/gm;
+
+/**
+ * Regular expression for parsing glsl-optimizer diagnostic messages.
+ * @type {RegExp}
+ * @const
+ * @private
+ */
+glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAGNOSTICS_ =
+    /^\((\d+),\d+\): (error|warning|info): (.*)$/gm;
 
 /**
  * Given a source file and a map of library files, parses the source file into
@@ -213,7 +222,6 @@ glslunit.compiler.Preprocessor.ParseFile =
   var result = glslunit.compiler.Preprocessor.ParseFileSource_(
       fileName, libraryFiles, provideFileMap, includedFiles,
       vertexSourceMap, fragmentSourceMap);
-  result.includedFiles = includedFiles;
 
   var licenseSet = {};
   var match;
@@ -290,10 +298,12 @@ glslunit.compiler.Preprocessor.ParseFile =
 
   function parseDiagnostics( output, sourceMap ) {
 
-    var result = output.replace( glslunit.compiler.Preprocessor.RE_GLSL_DIAGNOSTICS_,
-        function( match, type, lineNumber, message, offset, input ) {
+    var result = output.replace(
+		glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAG_PREFIX_, '' ).replace(
+		glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAGNOSTICS_,
+        function( match, lineNumber, type, message, offset, input ) {
 
-      if (type === 'Error') optimizationFailed = true;
+      if (type === 'error') optimizationFailed = true;
       var where = sourceMap[lineNumber - 1];
 
       console.log( where.fileName + ":" + (where.localLine + 1) + ": " +
