@@ -40,8 +40,8 @@ try {
 		console.error(e.stack || e);
 }
 
-myVertexShaderSourceCode = shader[glslprep.Shader.VERTEX);
-myFragmentShaderSourceCode = shader[glslprep.Shader.FRAGMENT);
+myVertexShaderSourceCode = shader[glslprep.Shader.VERTEX];
+myFragmentShaderSourceCode = shader[glslprep.Shader.FRAGMENT];
 
 ```
 
