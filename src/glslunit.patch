@@ -1,7 +1,6 @@
-Only in ../../glslunit.orig: .npmignore
-diff -ru ../../glslunit.orig/ast/glsl_parser.js glslunit/ast/glsl_parser.js
---- ../../glslunit.orig/ast/glsl_parser.js	2012-02-28 07:51:52.000000000 +0100
-+++ glslunit/ast/glsl_parser.js	2015-07-12 10:14:08.973335347 +0200
+diff -ru glslunit.orig/ast/glsl_parser.js glslunit/ast/glsl_parser.js
+--- glslunit.orig/ast/glsl_parser.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/ast/glsl_parser.js	2021-03-24 23:53:13.101791419 +0000
 @@ -3,17 +3,21 @@
   * @suppress {missingProperties|duplicate|checkVars}
   */
@@ -70,9 +69,9 @@ diff -ru ../../glslunit.orig/ast/glsl_parser.js glslunit/ast/glsl_parser.js
 -})();
 +  $module.SyntaxError.prototype = Error.prototype;
 +});
-diff -ru ../../glslunit.orig/ast/transformers/glsl_ast_transformer.js glslunit/ast/transformers/glsl_ast_transformer.js
---- ../../glslunit.orig/ast/transformers/glsl_ast_transformer.js	2012-05-04 20:42:54.000000000 +0200
-+++ glslunit/ast/transformers/glsl_ast_transformer.js	2015-07-12 09:02:18.654120680 +0200
+diff -ru glslunit.orig/ast/transformers/glsl_ast_transformer.js glslunit/ast/transformers/glsl_ast_transformer.js
+--- glslunit.orig/ast/transformers/glsl_ast_transformer.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/ast/transformers/glsl_ast_transformer.js	2021-03-24 23:53:13.101791419 +0000
 @@ -44,7 +44,7 @@
  glslunit.ASTTransformer = function() {
    /**
@@ -82,21 +81,10 @@ diff -ru ../../glslunit.orig/ast/transformers/glsl_ast_transformer.js glslunit/a
     * @private
     */
    this.mixed_in_visitors_ = [];
-diff -ru ../../glslunit.orig/ast/visitors/type_annotator.js glslunit/ast/visitors/type_annotator.js
---- ../../glslunit.orig/ast/visitors/type_annotator.js	2012-05-04 20:42:54.000000000 +0200
-+++ glslunit/ast/visitors/type_annotator.js	2016-08-28 14:24:50.813364499 +0200
-@@ -19,7 +19,7 @@
- glslunit.TypeAnnotator = function(rootNode) {
-   this.rootNode_ = rootNode;
- 
--  this.typeMap_ = {}''
-+  this.typeMap_ = {};
- };
- goog.inherits(glslunit.TypeAnnotator, glslunit.VariableScopeVisitor);
- 
-diff -ru ../../glslunit.orig/ast/visitors/variable_scope_visitor.js glslunit/ast/visitors/variable_scope_visitor.js
---- ../../glslunit.orig/ast/visitors/variable_scope_visitor.js	2012-05-04 20:42:54.000000000 +0200
-+++ glslunit/ast/visitors/variable_scope_visitor.js	2015-07-12 09:02:18.655120680 +0200
+Only in glslunit/ast/visitors: type_annotator.js
+diff -ru glslunit.orig/ast/visitors/variable_scope_visitor.js glslunit/ast/visitors/variable_scope_visitor.js
+--- glslunit.orig/ast/visitors/variable_scope_visitor.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/ast/visitors/variable_scope_visitor.js	2021-03-24 23:53:13.102791423 +0000
 @@ -67,14 +67,14 @@
  
    /**
@@ -114,10 +102,10 @@ diff -ru ../../glslunit.orig/ast/visitors/variable_scope_visitor.js glslunit/ast
     * @private
     */
    this.currentFrame_ = [];
-Only in ../../glslunit.orig: bin
-diff -ru ../../glslunit.orig/compiler/constructor_minifier.js glslunit/compiler/constructor_minifier.js
---- ../../glslunit.orig/compiler/constructor_minifier.js	2012-05-04 20:42:55.000000000 +0200
-+++ glslunit/compiler/constructor_minifier.js	2015-07-12 09:02:18.655120680 +0200
+Only in glslunit.orig: bin
+diff -ru glslunit.orig/compiler/constructor_minifier.js glslunit/compiler/constructor_minifier.js
+--- glslunit.orig/compiler/constructor_minifier.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/compiler/constructor_minifier.js	2021-03-24 23:53:13.102791423 +0000
 @@ -56,14 +56,14 @@
  /** @override */
  glslunit.compiler.ConstructorMinifier.prototype.getBeforeTransformFunction =
@@ -135,9 +123,9 @@ diff -ru ../../glslunit.orig/compiler/constructor_minifier.js glslunit/compiler/
  };
  
  
-diff -ru ../../glslunit.orig/compiler/declaration_consolidation.js glslunit/compiler/declaration_consolidation.js
---- ../../glslunit.orig/compiler/declaration_consolidation.js	2012-05-04 20:42:55.000000000 +0200
-+++ glslunit/compiler/declaration_consolidation.js	2016-08-28 14:24:50.813364499 +0200
+diff -ru glslunit.orig/compiler/declaration_consolidation.js glslunit/compiler/declaration_consolidation.js
+--- glslunit.orig/compiler/declaration_consolidation.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/compiler/declaration_consolidation.js	2021-03-24 23:53:13.103791426 +0000
 @@ -20,13 +20,13 @@
  
  /**
@@ -216,9 +204,9 @@ diff -ru ../../glslunit.orig/compiler/declaration_consolidation.js glslunit/comp
    shaderProgram.vertexAst =
        vertexTransformer.transformNode(shaderProgram.vertexAst);
    shaderProgram.fragmentAst =
-diff -ru ../../glslunit.orig/compiler/glsl_preprocessor.js glslunit/compiler/glsl_preprocessor.js
---- ../../glslunit.orig/compiler/glsl_preprocessor.js	2012-05-04 20:42:54.000000000 +0200
-+++ glslunit/compiler/glsl_preprocessor.js	2015-07-12 09:02:18.656120680 +0200
+diff -ru glslunit.orig/compiler/glsl_preprocessor.js glslunit/compiler/glsl_preprocessor.js
+--- glslunit.orig/compiler/glsl_preprocessor.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/compiler/glsl_preprocessor.js	2021-03-24 23:53:13.103791426 +0000
 @@ -402,7 +402,7 @@
          var expandedMacro = glslunit.compiler.GlslPreprocessor.processLine_(
              definition.tokens.join(''), definitions,
@@ -241,9 +229,27 @@ diff -ru ../../glslunit.orig/compiler/glsl_preprocessor.js glslunit/compiler/gls
  };
  
  
-diff -ru ../../glslunit.orig/compiler/node_flags.js glslunit/compiler/node_flags.js
---- ../../glslunit.orig/compiler/node_flags.js	2012-05-04 20:42:55.000000000 +0200
-+++ glslunit/compiler/node_flags.js	2016-08-28 14:24:50.813364499 +0200
+diff -ru glslunit.orig/compiler/name_generator.js glslunit/compiler/name_generator.js
+--- glslunit.orig/compiler/name_generator.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/compiler/name_generator.js	2024-06-23 19:47:17.249689248 +0100
+@@ -91,6 +91,14 @@
+       glslunit.compiler.NameGenerator.trailingCharacters_[(index % trailRadix)];
+     index = Math.floor(index / trailRadix);
+   }
++  switch (result) {
++	case 'if':
++    case 'do':
++    case 'for':
++	case 'try':
++      result += '_';
++    default:
++  }
+   return result;
+ };
+ 
+diff -ru glslunit.orig/compiler/node_flags.js glslunit/compiler/node_flags.js
+--- glslunit.orig/compiler/node_flags.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/compiler/node_flags.js	2021-03-24 23:53:13.103791426 +0000
 @@ -151,7 +151,6 @@
  
  /**
@@ -271,9 +277,9 @@ diff -ru ../../glslunit.orig/compiler/node_flags.js glslunit/compiler/node_flags
          lastParam = null;
        } else {
          console.error('Unknown flag ' + flag);
-diff -ru ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preprocessor.js
---- ../../glslunit.orig/compiler/preprocessor.js	2012-05-04 20:42:54.000000000 +0200
-+++ glslunit/compiler/preprocessor.js	2016-08-29 20:53:01.867558634 +0200
+diff -ru glslunit.orig/compiler/preprocessor.js glslunit/compiler/preprocessor.js
+--- glslunit.orig/compiler/preprocessor.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/compiler/preprocessor.js	2025-05-25 20:28:15.925069815 +0100
 @@ -169,6 +169,24 @@
  glslunit.compiler.Preprocessor.RE_OVERRIDE_ =
      /\/\/!\s*OVERRIDE\s+(\S+)\s+(\S+)/;
@@ -411,14 +417,14 @@ diff -ru ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preproce
    return result;
 +
 +  function parseDiagnostics( output, sourceMap ) {
-+
 +    var result = output.replace(
 +		glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAG_PREFIX_, '' ).replace(
 +		glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAGNOSTICS_,
 +        function( match, lineNumber, type, message, offset, input ) {
 +
 +      if (type === 'error') optimizationFailed = true;
-+      var where = sourceMap[lineNumber - 1];
++      var where = sourceMap[lineNumber - 1] || {
++          fileName: "<unknown>", lineNumber: lineNumber - 1 };
 +
 +      console.log( where.fileName + ":" + (where.localLine + 1) + ": " +
 +          type + ": " + message );
@@ -491,9 +497,26 @@ diff -ru ../../glslunit.orig/compiler/preprocessor.js glslunit/compiler/preproce
  };
  
  
-diff -ru ../../glslunit.orig/compiler/utils.js glslunit/compiler/utils.js
---- ../../glslunit.orig/compiler/utils.js	2012-05-04 20:42:55.000000000 +0200
-+++ glslunit/compiler/utils.js	2015-07-12 09:02:18.657120680 +0200
+diff -ru glslunit.orig/compiler/template_compiler.js glslunit/compiler/template_compiler.js
+--- glslunit.orig/compiler/template_compiler.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/compiler/template_compiler.js	2021-03-24 23:53:13.104791429 +0000
+@@ -193,11 +193,11 @@
+     } else {
+       template_source = fs.readFileSync(goog.node.FLAGS.template, 'utf8');
+     }
+-    shaderProgram.defaultProgramShortNames();
++    shaderProgram.defaultUniformsAndAttributes();
+     output = Mustache.to_html(template_source, shaderProgram) + '\n';
+     var template = false;
+     var template_source = fs.readFileSync(goog.node.FLAGS.template, 'utf8');
+-    shaderProgram.defaultProgramShortNames();
++    shaderProgram.defaultUniformsAndAttributes();
+     output = Mustache.to_html(template_source, shaderProgram) + '\n';
+   } else {
+     output =
+diff -ru glslunit.orig/compiler/utils.js glslunit/compiler/utils.js
+--- glslunit.orig/compiler/utils.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/compiler/utils.js	2021-03-24 23:53:13.104791429 +0000
 @@ -40,10 +40,10 @@
   */
  glslunit.compiler.Utils.getStructDeclarations = function(node) {
@@ -507,9 +530,9 @@ diff -ru ../../glslunit.orig/compiler/utils.js glslunit/compiler/utils.js
    var result = [];
    goog.array.forEach(structNodes, function(structDeclarator) {
      result[structDeclarator.id] = true;
-diff -ru ../../glslunit.orig/compiler/variable_minifier.js glslunit/compiler/variable_minifier.js
---- ../../glslunit.orig/compiler/variable_minifier.js	2012-05-04 20:42:55.000000000 +0200
-+++ glslunit/compiler/variable_minifier.js	2016-08-28 14:24:50.813364499 +0200
+diff -ru glslunit.orig/compiler/variable_minifier.js glslunit/compiler/variable_minifier.js
+--- glslunit.orig/compiler/variable_minifier.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/compiler/variable_minifier.js	2021-03-24 23:53:13.104791429 +0000
 @@ -137,7 +137,6 @@
        }
      }
@@ -534,12 +557,13 @@ diff -ru ../../glslunit.orig/compiler/variable_minifier.js glslunit/compiler/var
  /**
   * Push the stack before transforming a function declaration.  We need to do
   *     this in addition pushing the stack when transforming a scope so we can
-Only in ../../glslunit.orig: demo_site
-Only in ../../glslunit.orig: example
-Only in ../../glslunit.orig: executor
-diff -ru ../../glslunit.orig/glsl_generator.js glslunit/glsl_generator.js
---- ../../glslunit.orig/glsl_generator.js	2016-08-18 15:07:49.495013770 +0200
-+++ glslunit/glsl_generator.js	2015-07-12 09:02:18.657120680 +0200
+Only in glslunit.orig: demo_site
+Only in glslunit.orig: example
+Only in glslunit.orig: executor
+Only in glslunit.orig: .git
+diff -ru glslunit.orig/glsl_generator.js glslunit/glsl_generator.js
+--- glslunit.orig/glsl_generator.js	2016-03-16 01:41:26.000000000 +0000
++++ glslunit/glsl_generator.js	2021-03-24 23:53:13.104791429 +0000
 @@ -297,7 +297,6 @@
  
  /**
@@ -828,10 +852,11 @@ diff -ru ../../glslunit.orig/glsl_generator.js glslunit/glsl_generator.js
      } else {
        addParen = true;
      }
-Only in ../../glslunit.orig: glsl_generator_test.js
-Only in ../../glslunit.orig: glsl_parser_test.js
-Only in ../../glslunit.orig: glslunit_jstdadapter
-Only in ../../glslunit.orig: package.json
-Only in ../../glslunit.orig: testing
-Only in ../../glslunit.orig: third-party
-Only in ../../glslunit.orig: utils_test.js
+Only in glslunit.orig: glsl_generator_test.js
+Only in glslunit.orig: glsl_parser_test.js
+Only in glslunit.orig: glslunit_jstdadapter
+Only in glslunit.orig: .npmignore
+Only in glslunit.orig: package.json
+Only in glslunit.orig: testing
+Only in glslunit.orig: third-party
+Only in glslunit.orig: utils_test.js
