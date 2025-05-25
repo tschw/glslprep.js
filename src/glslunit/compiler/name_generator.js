@@ -91,6 +91,14 @@ glslunit.compiler.NameGenerator.getShortName = function(index) {
       glslunit.compiler.NameGenerator.trailingCharacters_[(index % trailRadix)];
     index = Math.floor(index / trailRadix);
   }
+  switch (result) {
+	case 'if':
+    case 'do':
+    case 'for':
+	case 'try':
+      result += '_';
+    default:
+  }
   return result;
 };
 

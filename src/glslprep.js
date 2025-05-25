@@ -119,8 +119,9 @@ function main() {
   });
   var templateFiles = loadFiles(inputDir,
                                 goog.node.FLAGS.template_include_prefix);
-
-  var start = new Date().getTime();
+  var workDir = process.cwd();
+  process.chdir(goog.global['scriptDir']);
+  var start = Date.now();
   try {
     var shaderProgram = glslunit.compiler.Preprocessor.ParseFile(
         path.basename(goog.node.FLAGS.input),
@@ -129,9 +130,9 @@ function main() {
     console.error(e.message);
     process.exit(1);
   }
-  var finish = new Date().getTime();
-
-  start = new Date().getTime();
+  var finish = Date.now();
+  process.chdir(workDir);
+  start = Date.now();
   var compiler = new glslunit.compiler.Compiler(shaderProgram);
 
   var all_internal_map = {

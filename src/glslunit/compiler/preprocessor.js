@@ -297,14 +297,14 @@ glslunit.compiler.Preprocessor.ParseFile =
   return result;
 
   function parseDiagnostics( output, sourceMap ) {
-
     var result = output.replace(
 		glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAG_PREFIX_, '' ).replace(
 		glslunit.compiler.Preprocessor.RE_OPTIMIZER_DIAGNOSTICS_,
         function( match, lineNumber, type, message, offset, input ) {
 
       if (type === 'error') optimizationFailed = true;
-      var where = sourceMap[lineNumber - 1];
+      var where = sourceMap[lineNumber - 1] || {
+          fileName: "<unknown>", lineNumber: lineNumber - 1 };
 
       console.log( where.fileName + ":" + (where.localLine + 1) + ": " +
           type + ": " + message );

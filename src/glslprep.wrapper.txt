@@ -2,5 +2,6 @@
 
 var fs = require('fs');
 var path = require('path');
+this.scriptDir = path.dirname(__filename);
 
 %output%
